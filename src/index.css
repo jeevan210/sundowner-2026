@@ -2110,12 +2110,23 @@ body {
   padding: 3rem;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--glow-shadow);
   backdrop-filter: blur(20px);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 @media (max-width: 768px) {
   .booking-clean-box {
-    padding: 1.65rem 1.25rem;
-    border-radius: 20px;
+    padding: 1.35rem 1rem !important;
+    border-radius: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-clean-box {
+    padding: 1.1rem 0.65rem !important;
+    border-radius: 16px !important;
   }
 }
 
@@ -2124,13 +2135,23 @@ body {
   grid-template-columns: 1.18fr 0.82fr;
   gap: 3rem;
   align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 992px) {
   .booking-clean-grid {
     grid-template-columns: 1fr;
-    gap: 2.25rem;
+    gap: 2rem;
   }
+}
+
+.booking-steps-column, .booking-pass-column {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .booking-steps-heading {
@@ -2149,6 +2170,8 @@ body {
   flex-direction: column;
   gap: 1.15rem;
   margin: 1.5rem 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .reg-step-row {
@@ -2160,11 +2183,21 @@ body {
   border-radius: 16px;
   padding: 1rem 1.25rem;
   transition: all 0.25s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .reg-step-row:hover {
   background: rgba(229, 152, 56, 0.05);
   border-color: var(--border-amber);
+}
+
+@media (max-width: 480px) {
+  .reg-step-row {
+    padding: 0.75rem 0.75rem !important;
+    gap: 0.65rem !important;
+  }
 }
 
 .reg-step-num {
@@ -2180,6 +2213,12 @@ body {
   flex-shrink: 0;
 }
 
+.reg-step-text {
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 .reg-step-text h4 {
   font-size: 0.98rem;
   font-weight: 700;
@@ -2191,6 +2230,15 @@ body {
   font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.55;
+}
+
+@media (max-width: 480px) {
+  .reg-step-text h4 {
+    font-size: 0.88rem !important;
+  }
+  .reg-step-text p {
+    font-size: 0.78rem !important;
+  }
 }
 
 .form-pill-tags {
@@ -2218,6 +2266,27 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-booking-register {
+  width: 100%;
+  padding: 0.95rem 1.25rem;
+  font-size: 0.98rem;
+  font-weight: 800;
+  text-align: center;
+  border-radius: 9999px;
+  box-sizing: border-box;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+@media (max-width: 480px) {
+  .btn-booking-register {
+    padding: 0.8rem 1rem !important;
+    font-size: 0.88rem !important;
+  }
 }
 
 .booking-buttons-grid {
@@ -2233,6 +2302,8 @@ body {
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.25rem;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .booking-cfg-link {
@@ -2250,22 +2321,29 @@ body {
 /* VIP Digital Pass Card */
 .qr-card-3d-wrapper {
   border-radius: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .qr-clean-card {
   background: var(--bg-surface);
   border: 1.5px solid var(--border-amber);
   border-radius: 20px;
-  padding: 2rem;
+  padding: 2rem 1.5rem;
   text-align: center;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.75);
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 480px) {
   .qr-clean-card {
-    padding: 1.35rem;
+    padding: 1.15rem 0.75rem !important;
+    border-radius: 16px !important;
   }
 }
 
@@ -2274,6 +2352,16 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .qr-header-bar {
+    justify-content: center !important;
+    gap: 0.4rem !important;
+  }
 }
 
 .qr-pass-tag {
@@ -2298,16 +2386,19 @@ body {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-bottom: 0.95rem;
+  line-height: 1.4;
 }
 
 .qr-box-img {
-  max-width: 220px;
-  margin: 0 auto;
-  padding: 0.65rem;
+  max-width: 200px;
+  width: 100%;
+  margin: 0.65rem auto;
+  padding: 0.6rem;
   background: #FFFFFF;
   border-radius: 14px;
   border: 2px solid var(--border-amber);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
 }
 
 .qr-box-img img {
@@ -2315,6 +2406,7 @@ body {
   height: auto;
   display: block;
   border-radius: 6px;
+  object-fit: contain;
 }
 
 .qr-payee-info {
@@ -2345,16 +2437,33 @@ body {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-amber);
   border-radius: 9999px;
-  padding: 0.35rem 0.5rem 0.35rem 1rem;
-  margin-top: 0.85rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+  margin: 0.85rem auto 0 auto;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  gap: 0.45rem;
 }
 
 .upi-text {
   font-family: monospace;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-main);
   word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .upi-text {
+    font-size: 0.74rem;
+  }
+  .btn-copy-upi {
+    padding: 0.3rem 0.65rem !important;
+    font-size: 0.7rem !important;
+  }
 }
 
 .btn-copy-upi {
@@ -2368,6 +2477,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-copy-upi:hover {
@@ -2376,9 +2486,11 @@ body {
 }
 
 .qr-footer-date {
-  margin-top: 0.95rem;
+  margin-top: 0.85rem;
   font-size: 0.75rem;
   color: var(--text-muted);
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 /* Venue Section */
@@ -2678,6 +2790,42 @@ body {
   box-shadow: 0 0 50px var(--glow-shadow);
   border: 1.5px solid var(--border-glow);
   background: #000;
+  box-sizing: border-box;
+}
+
+/* Register Modal Responsive Dialog */
+.register-modal-content {
+  position: relative;
+  max-width: 560px;
+  width: 100%;
+  background: var(--bg-surface);
+  padding: 2.25rem;
+  border: 1px solid var(--border-amber);
+  border-radius: 24px;
+  box-shadow: 0 0 50px var(--glow-shadow);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.reg-modal-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 0.65rem !important;
+  }
+  .register-modal-content {
+    padding: 1.25rem 0.95rem !important;
+    border-radius: 18px !important;
+    max-height: 92vh;
+  }
+  .reg-modal-grid-row {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .modal-content-box img {
@@ -2994,5 +3142,20 @@ body {
 
 .photo-card-3d-wrap {
   border-radius: 14px;
+}
+
+/* Mobile Touchscreen 3D Overflow Safety — Keeps all cards strictly inside screen bounds */
+@media (max-width: 768px) {
+  .interactive-3d-card {
+    transform: none !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .layer-3d-float {
+    transform: none !important;
+  }
+  .box-3d-depth {
+    transform: none !important;
+  }
 }
 

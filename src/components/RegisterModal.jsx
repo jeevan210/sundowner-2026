@@ -93,8 +93,7 @@ export default function RegisterModal({ isOpen, onClose, onRegisterSuccess, upiI
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div 
-        className="modal-content-box box-3d-depth" 
-        style={{ maxWidth: '560px', background: '#120F0D', padding: '2.25rem', border: '1px solid var(--border-amber)' }} 
+        className="register-modal-content box-3d-depth" 
         onClick={e => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -210,7 +209,7 @@ export default function RegisterModal({ isOpen, onClose, onRegisterSuccess, upiI
               </div>
 
               {/* Age & Phone Number */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
+              <div className="reg-modal-grid-row">
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Age

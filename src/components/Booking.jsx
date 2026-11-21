@@ -89,9 +89,8 @@ export default function Booking({ onOpenRegisterModal }) {
                 <div>
                   <button 
                     type="button" 
-                    className="btn btn-primary btn-pulse btn-3d-depth"
+                    className="btn btn-primary btn-pulse btn-3d-depth btn-booking-register"
                     onClick={onOpenRegisterModal}
-                    style={{ width: '100%', padding: '1rem 1.8rem', fontSize: '1rem' }}
                   >
                     <i className="fa-solid fa-bolt"></i> Register on Website Now (Get VIP Pass)
                   </button>
@@ -99,7 +98,7 @@ export default function Booking({ onOpenRegisterModal }) {
                 
                 <div className="booking-trust-note">
                   <i className="fa-solid fa-shield-check text-orange"></i>
-                  <span>Verified pass issuance. All registrations are verified directly by coordinators Sonika, Arzoo, Krupa & Kuber.</span>
+                  <span>Verified pass issuance. All registrations are verified directly by coordinators Sonika, Arzoo, Krupa &amp; Kuber.</span>
                 </div>
               </div>
 
