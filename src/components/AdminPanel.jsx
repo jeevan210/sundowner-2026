@@ -77,7 +77,15 @@ export default function AdminPanel({
   // Passcode verification
   const handleLogin = (e) => {
     e.preventDefault();
-    if (passcode.trim() === '2026' || passcode.trim().toLowerCase() === 'admin' || passcode.trim().toLowerCase() === 'admin2026') {
+    const entered = passcode.trim();
+    const customPasscode = import.meta.env.VITE_ADMIN_PASSCODE ? import.meta.env.VITE_ADMIN_PASSCODE.trim() : null;
+
+    if (
+      entered === '2026' || 
+      entered.toLowerCase() === 'admin' || 
+      entered.toLowerCase() === 'admin2026' ||
+      (customPasscode && entered === customPasscode)
+    ) {
       setIsAuthenticated(true);
       sessionStorage.setItem('sundowner_admin_auth', 'true');
       setErrorMsg('');
