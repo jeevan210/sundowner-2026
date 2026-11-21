@@ -26,14 +26,6 @@ export default function Footer({ onOpenAdmin }) {
             <li><a onClick={() => scrollTo('snapshot')} style={{ cursor: 'pointer' }}>Snapshot</a></li>
             <li><a onClick={() => scrollTo('rules')} style={{ cursor: 'pointer' }}>Rules</a></li>
             <li><a onClick={() => scrollTo('tickets')} style={{ cursor: 'pointer' }}>Book Pass</a></li>
-            <li>
-              <a 
-                onClick={onOpenAdmin} 
-                style={{ cursor: 'pointer', color: 'var(--amber-gold)', fontWeight: 700 }}
-              >
-                <i className="fa-solid fa-lock"></i> Admin Portal
-              </a>
-            </li>
           </ul>
         </div>
 
@@ -41,16 +33,8 @@ export default function Footer({ onOpenAdmin }) {
           <div>
             &copy; 2026 Sundowner Event. All rights reserved. Orchard Resort, Navge Cross, Belagavi.
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div>
             <span>Coordinators: Sonika, Arzoo, Krupa &amp; Kuber</span>
-            <span>&bull;</span>
-            <button
-              type="button"
-              onClick={onOpenAdmin}
-              style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline' }}
-            >
-              Coordinator Login
-            </button>
           </div>
         </div>
       </div>

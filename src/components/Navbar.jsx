@@ -129,16 +129,6 @@ export default function Navbar({ onOpenTickets, onOpenAdmin, currentTheme, onTog
             )}
           </button>
 
-          {/* Admin Portal Button */}
-          <button 
-            type="button" 
-            className="btn-admin-pill"
-            onClick={onOpenAdmin}
-            title="Coordinator Admin Portal"
-          >
-            <i className="fa-solid fa-user-shield"></i> <span className="admin-text-label">Admin</span>
-          </button>
-
           {/* Primary Book Pass CTA */}
           <button 
             type="button" 
@@ -196,14 +186,6 @@ export default function Navbar({ onOpenTickets, onOpenAdmin, currentTheme, onTog
               ) : (
                 <><i className="fa-solid fa-sun text-orange"></i> Sunset Vibe</>
               )}
-            </button>
-            <button 
-              type="button" 
-              className="btn btn-secondary btn-sm"
-              onClick={() => { setMobileMenuOpen(false); onOpenAdmin(); }}
-              style={{ justifyContent: 'center' }}
-            >
-              <i className="fa-solid fa-user-shield text-orange"></i> Admin Portal
             </button>
           </div>
 

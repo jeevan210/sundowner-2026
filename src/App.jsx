@@ -87,6 +87,34 @@ export default function App() {
     }
   });
 
+  // Hidden direct URL access: opens Admin Portal when navigating to /admin, #admin, or ?admin
+  useEffect(() => {
+    const checkUrlForAdmin = () => {
+      const path = (window.location.pathname || '').toLowerCase();
+      const hash = (window.location.hash || '').toLowerCase();
+      const search = (window.location.search || '').toLowerCase();
+      if (path === '/admin' || path.endsWith('/admin') || hash === '#admin' || search.includes('admin')) {
+        setAdminPanelOpen(true);
+      }
+    };
+    checkUrlForAdmin();
+    window.addEventListener('hashchange', checkUrlForAdmin);
+    window.addEventListener('popstate', checkUrlForAdmin);
+    return () => {
+      window.removeEventListener('hashchange', checkUrlForAdmin);
+      window.removeEventListener('popstate', checkUrlForAdmin);
+    };
+  }, []);
+
+  const handleCloseAdmin = () => {
+    setAdminPanelOpen(false);
+    if (window.location.hash === '#admin') {
+      window.history.replaceState(null, '', window.location.pathname);
+    } else if (window.location.pathname === '/admin' || window.location.pathname.endsWith('/admin')) {
+      window.history.replaceState(null, '', '/');
+    }
+  };
+
   // Fetch registrations from MongoDB backend API
   useEffect(() => {
     const loadFromApi = async () => {
@@ -177,8 +205,8 @@ export default function App() {
         <Venue onRegisterClick={handleScrollToTickets} />
       </main>
 
-      {/* Clean Footer with Coordinator Portal Link */}
-      <Footer onOpenAdmin={() => setAdminPanelOpen(true)} />
+      {/* Clean Footer */}
+      <Footer />
 
       {/* Sticky Mobile Registration CTA */}
       <MobileBottomBar onRegisterClick={handleScrollToTickets} />
@@ -197,10 +225,10 @@ export default function App() {
         upiId="8151090944@postbank"
       />
 
-      {/* Coordinator Admin Panel Dashboard */}
+      {/* Coordinator Admin Panel Dashboard (Accessed via /admin, #admin, or ?admin) */}
       <AdminPanel
         isOpen={adminPanelOpen}
-        onClose={() => setAdminPanelOpen(false)}
+        onClose={handleCloseAdmin}
         registrations={registrations}
         onUpdateStatus={handleUpdateStatus}
         onDeleteRegistration={handleDeleteRegistration}

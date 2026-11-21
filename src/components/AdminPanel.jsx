@@ -81,9 +81,7 @@ export default function AdminPanel({
     const customPasscode = import.meta.env.VITE_ADMIN_PASSCODE ? import.meta.env.VITE_ADMIN_PASSCODE.trim() : null;
 
     if (
-      entered === '2026' || 
-      entered.toLowerCase() === 'admin' || 
-      entered.toLowerCase() === 'admin2026' ||
+      entered === 'Tuffi@Sona' ||
       (customPasscode && entered === customPasscode)
     ) {
       setIsAuthenticated(true);
@@ -91,7 +89,7 @@ export default function AdminPanel({
       setErrorMsg('');
       fetchRegistrations();
     } else {
-      setErrorMsg('Incorrect passcode. (Default: 2026)');
+      setErrorMsg('Incorrect coordinator passcode.');
     }
   };
 
@@ -391,7 +389,7 @@ export default function AdminPanel({
             <form onSubmit={handleLogin}>
               <input 
                 type="password" 
-                placeholder="Enter passcode (Default: 2026)"
+                placeholder="Enter coordinator passcode"
                 value={passcode}
                 onChange={e => setPasscode(e.target.value)}
                 autoFocus
