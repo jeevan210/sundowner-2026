@@ -76,8 +76,19 @@ export default function Hero({ onOpenTickets }) {
 
   return (
     <section className="hero-mockup-section" id="hero">
-      {/* Background with Dark Vignette for Crisp Contrast */}
+      {/* Background Media: Desktop Image & Mobile Video */}
       <div className="hero-backdrop-image"></div>
+      <div className="hero-backdrop-video-wrap">
+        <video 
+          className="hero-backdrop-video" 
+          src="/assets/10231614-hd_1080_1920_30fps.mp4"
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          preload="auto"
+        />
+      </div>
       <div className="hero-dark-vignette"></div>
 
       <div className="hero-main-container">
@@ -192,11 +203,11 @@ export default function Hero({ onOpenTickets }) {
 
         </div>
 
-        {/* Right Showcase Column: Premium Interactive 3D Countdown & Event Highlights Card */}
+        {/* Right Showcase Column: Compact Interactive 3D Countdown & Event Highlights Card */}
         <div className="hero-showcase-column">
           <Interactive3DCard 
-            maxTilt={7} 
-            depth={20} 
+            maxTilt={6} 
+            depth={15} 
             className="hero-showcase-card-3d"
           >
             <div className="hero-event-showcase-card">
@@ -204,73 +215,51 @@ export default function Hero({ onOpenTickets }) {
               <div className="showcase-card-header layer-3d-float">
                 <div className="live-status-pill">
                   <span className="live-dot-pulse"></span>
-                  <span>LIVE EVENT COUNTDOWN</span>
+                  <span>STARTS IN</span>
                 </div>
-                <span className="showcase-edition-tag">LIMITED PASSES</span>
+                <span className="showcase-edition-tag">SUNDOWNER 2026</span>
               </div>
 
-              {/* Countdown Digits Matrix */}
+              {/* Compact Countdown Digits */}
               <div className="showcase-countdown-wrapper layer-3d-float">
                 <div className="sc-cd-col">
-                  <div className="sc-digit-well">
-                    <span className="sc-digit">{timeLeft.days}</span>
-                  </div>
+                  <span className="sc-digit">{timeLeft.days}</span>
                   <span className="sc-unit">DAYS</span>
                 </div>
                 <span className="sc-separator">:</span>
                 <div className="sc-cd-col">
-                  <div className="sc-digit-well">
-                    <span className="sc-digit">{timeLeft.hours}</span>
-                  </div>
+                  <span className="sc-digit">{timeLeft.hours}</span>
                   <span className="sc-unit">HOURS</span>
                 </div>
                 <span className="sc-separator">:</span>
                 <div className="sc-cd-col">
-                  <div className="sc-digit-well">
-                    <span className="sc-digit">{timeLeft.mins}</span>
-                  </div>
+                  <span className="sc-digit">{timeLeft.mins}</span>
                   <span className="sc-unit">MINS</span>
                 </div>
                 <span className="sc-separator">:</span>
                 <div className="sc-cd-col">
-                  <div className="sc-digit-well">
-                    <span className="sc-digit">{timeLeft.secs}</span>
-                  </div>
+                  <span className="sc-digit">{timeLeft.secs}</span>
                   <span className="sc-unit">SECS</span>
                 </div>
               </div>
 
-              {/* Divider */}
-              <div className="showcase-card-divider"></div>
-
-              {/* Event Key Highlights List */}
-              <div className="showcase-perks-list layer-3d-float">
-                <div className="showcase-perk-row">
-                  <div className="perk-icon-wrap"><i className="fa-regular fa-clock"></i></div>
-                  <div className="perk-text-wrap">
-                    <span className="perk-title">4:00 PM &ndash; 8:00 PM</span>
-                    <span className="perk-sub">Entry starts 3:30 PM &bull; Pool open till 6:30 PM</span>
-                  </div>
+              {/* Event Key Highlights Mini Pills */}
+              <div className="showcase-perks-compact layer-3d-float">
+                <div className="sc-perk-pill">
+                  <i className="fa-regular fa-clock text-orange"></i>
+                  <span>4:00 PM &ndash; 8:00 PM &bull; Pool till 6:30 PM</span>
                 </div>
-
-                <div className="showcase-perk-row">
-                  <div className="perk-icon-wrap"><i className="fa-solid fa-martini-glass-citrus"></i></div>
-                  <div className="perk-text-wrap">
-                    <span className="perk-title">Complimentary Refreshments</span>
-                    <span className="perk-sub">Chilled botanical mocktails & hot high-tea snacks</span>
-                  </div>
+                <div className="sc-perk-pill">
+                  <i className="fa-solid fa-martini-glass-citrus text-orange"></i>
+                  <span>Free Mocktails & Hot Snacks</span>
                 </div>
-
-                <div className="showcase-perk-row">
-                  <div className="perk-icon-wrap"><i className="fa-solid fa-music"></i></div>
-                  <div className="perk-text-wrap">
-                    <span className="perk-title">Live DJ Sunset Arena</span>
-                    <span className="perk-sub">Curated poolside party & sundowner tracks</span>
-                  </div>
+                <div className="sc-perk-pill">
+                  <i className="fa-solid fa-music text-orange"></i>
+                  <span>Live Sunset DJ Arena</span>
                 </div>
               </div>
 
-              {/* Quick Action Button inside Card */}
+              {/* Compact Action Button inside Card */}
               <div className="showcase-action-box layer-3d-float">
                 <button 
                   type="button" 
@@ -278,11 +267,11 @@ export default function Hero({ onOpenTickets }) {
                   onClick={onOpenTickets}
                 >
                   <i className="fa-solid fa-ticket"></i>
-                  <span>Reserve Entry Pass &bull; &#8377;500</span>
+                  <span>Book Pass &bull; &#8377;500</span>
                   <i className="fa-solid fa-arrow-right"></i>
                 </button>
                 <div className="showcase-guarantee-note">
-                  <i className="fa-solid fa-bolt text-orange"></i> Instant WhatsApp & Email QR Delivery
+                  <i className="fa-solid fa-bolt text-orange"></i> Instant WhatsApp QR Pass
                 </div>
               </div>
 
