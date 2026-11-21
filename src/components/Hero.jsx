@@ -82,8 +82,8 @@ export default function Hero({ onOpenTickets }) {
 
       <div className="hero-main-container">
         
-        {/* Left Aligned Content Stack matching the screenshot */}
-        <div className="hero-left-column">
+        {/* Left Content Column */}
+        <div className="hero-content-column">
           
           {/* Top Date Badge with Subtle Luxury Sheen */}
           <div className="hero-top-badge">
@@ -171,7 +171,7 @@ export default function Hero({ onOpenTickets }) {
               className="btn-hero-primary btn-3d-depth" 
               onClick={onOpenTickets}
             >
-              <i className="fa-solid fa-ticket"></i> Book Your Pass
+              <i className="fa-solid fa-ticket"></i> Book Your Pass &bull; &#8377;500
             </button>
 
             <button 
@@ -183,49 +183,111 @@ export default function Hero({ onOpenTickets }) {
             </button>
           </div>
 
-          {/* Integrated Modern Countdown Box with Sleek Minimalist Glass Depth */}
+          {/* Quick Trust / Feature Chips row */}
+          <div className="hero-trust-chips">
+            <span className="trust-chip"><i className="fa-solid fa-shield-halved text-orange"></i> Verified Entry Pass</span>
+            <span className="trust-chip"><i className="fa-solid fa-qrcode text-orange"></i> Instant WhatsApp QR</span>
+            <span className="trust-chip"><i className="fa-solid fa-person-swimming text-orange"></i> Pool Access Included</span>
+          </div>
+
+        </div>
+
+        {/* Right Showcase Column: Premium Interactive 3D Countdown & Event Highlights Card */}
+        <div className="hero-showcase-column">
           <Interactive3DCard 
-            maxTilt={8} 
-            depth={15} 
-            className="hero-countdown-card-3d"
+            maxTilt={7} 
+            depth={20} 
+            className="hero-showcase-card-3d"
           >
-            <div className="hero-countdown-card">
-              <div className="countdown-lead-box layer-3d-float">
-                <span className="cd-lead-small">COUNTDOWN TO</span>
-                <span className="cd-lead-bold">SUNDOWNER</span>
+            <div className="hero-event-showcase-card">
+              {/* Card Top Pill */}
+              <div className="showcase-card-header layer-3d-float">
+                <div className="live-status-pill">
+                  <span className="live-dot-pulse"></span>
+                  <span>LIVE EVENT COUNTDOWN</span>
+                </div>
+                <span className="showcase-edition-tag">LIMITED PASSES</span>
               </div>
 
-              <div className="cd-divider"></div>
-
-              <div className="countdown-digits-grid layer-3d-float">
-                <div className="cd-col">
-                  <div className="cd-digit-well">
-                    <span className="cd-digit">{timeLeft.days}</span>
+              {/* Countdown Digits Matrix */}
+              <div className="showcase-countdown-wrapper layer-3d-float">
+                <div className="sc-cd-col">
+                  <div className="sc-digit-well">
+                    <span className="sc-digit">{timeLeft.days}</span>
                   </div>
-                  <span className="cd-unit">DAYS</span>
+                  <span className="sc-unit">DAYS</span>
                 </div>
-                <div className="cd-col">
-                  <div className="cd-digit-well">
-                    <span className="cd-digit">{timeLeft.hours}</span>
+                <span className="sc-separator">:</span>
+                <div className="sc-cd-col">
+                  <div className="sc-digit-well">
+                    <span className="sc-digit">{timeLeft.hours}</span>
                   </div>
-                  <span className="cd-unit">HOURS</span>
+                  <span className="sc-unit">HOURS</span>
                 </div>
-                <div className="cd-col">
-                  <div className="cd-digit-well">
-                    <span className="cd-digit">{timeLeft.mins}</span>
+                <span className="sc-separator">:</span>
+                <div className="sc-cd-col">
+                  <div className="sc-digit-well">
+                    <span className="sc-digit">{timeLeft.mins}</span>
                   </div>
-                  <span className="cd-unit">MINS</span>
+                  <span className="sc-unit">MINS</span>
                 </div>
-                <div className="cd-col">
-                  <div className="cd-digit-well">
-                    <span className="cd-digit">{timeLeft.secs}</span>
+                <span className="sc-separator">:</span>
+                <div className="sc-cd-col">
+                  <div className="sc-digit-well">
+                    <span className="sc-digit">{timeLeft.secs}</span>
                   </div>
-                  <span className="cd-unit">SECS</span>
+                  <span className="sc-unit">SECS</span>
                 </div>
               </div>
+
+              {/* Divider */}
+              <div className="showcase-card-divider"></div>
+
+              {/* Event Key Highlights List */}
+              <div className="showcase-perks-list layer-3d-float">
+                <div className="showcase-perk-row">
+                  <div className="perk-icon-wrap"><i className="fa-regular fa-clock"></i></div>
+                  <div className="perk-text-wrap">
+                    <span className="perk-title">4:00 PM &ndash; 8:00 PM</span>
+                    <span className="perk-sub">Entry starts 3:30 PM &bull; Pool open till 6:30 PM</span>
+                  </div>
+                </div>
+
+                <div className="showcase-perk-row">
+                  <div className="perk-icon-wrap"><i className="fa-solid fa-martini-glass-citrus"></i></div>
+                  <div className="perk-text-wrap">
+                    <span className="perk-title">Complimentary Refreshments</span>
+                    <span className="perk-sub">Chilled botanical mocktails & hot high-tea snacks</span>
+                  </div>
+                </div>
+
+                <div className="showcase-perk-row">
+                  <div className="perk-icon-wrap"><i className="fa-solid fa-music"></i></div>
+                  <div className="perk-text-wrap">
+                    <span className="perk-title">Live DJ Sunset Arena</span>
+                    <span className="perk-sub">Curated poolside party & sundowner tracks</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Action Button inside Card */}
+              <div className="showcase-action-box layer-3d-float">
+                <button 
+                  type="button" 
+                  className="btn-showcase-book" 
+                  onClick={onOpenTickets}
+                >
+                  <i className="fa-solid fa-ticket"></i>
+                  <span>Reserve Entry Pass &bull; &#8377;500</span>
+                  <i className="fa-solid fa-arrow-right"></i>
+                </button>
+                <div className="showcase-guarantee-note">
+                  <i className="fa-solid fa-bolt text-orange"></i> Instant WhatsApp & Email QR Delivery
+                </div>
+              </div>
+
             </div>
           </Interactive3DCard>
-
         </div>
 
       </div>

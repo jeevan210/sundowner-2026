@@ -66,9 +66,9 @@ export default function App() {
   const [adminPanelOpen, setAdminPanelOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
 
-  // Theme switcher state: 'sunset' | 'midnight'
+  // Theme switcher state: 'midnight' (primary default) | 'sunset'
   const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem('sundowner_theme') || 'sunset';
+    return localStorage.getItem('sundowner_theme') || 'midnight';
   });
 
   const toggleTheme = () => {
