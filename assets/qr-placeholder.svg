@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="qrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E00" />
+      <stop offset="50%" stop-color="#FF9900" />
+      <stop offset="100%" stop-color="#FF4500" />
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FF7A00" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" rx="24" fill="#0E0B0A" />
+  <rect width="400" height="400" rx="24" fill="url(#centerGlow)" />
+  <rect x="1.5" y="1.5" width="397" height="397" rx="22.5" fill="none" stroke="url(#qrGrad)" stroke-width="2" opacity="0.6" />
+
+  <!-- Corner Finder Patterns -->
+  <!-- Top Left -->
+  <rect x="40" y="40" width="80" height="80" rx="14" fill="none" stroke="url(#qrGrad)" stroke-width="10" />
+  <rect x="62" y="62" width="36" height="36" rx="6" fill="#FFAA00" />
+
+  <!-- Top Right -->
+  <rect x="280" y="40" width="80" height="80" rx="14" fill="none" stroke="url(#qrGrad)" stroke-width="10" />
+  <rect x="302" y="62" width="36" height="36" rx="6" fill="#FFAA00" />
+
+  <!-- Bottom Left -->
+  <rect x="40" y="280" width="80" height="80" rx="14" fill="none" stroke="url(#qrGrad)" stroke-width="10" />
+  <rect x="62" y="302" width="36" height="36" rx="6" fill="#FFAA00" />
+
+  <!-- Simulated QR Pattern Matrix -->
+  <!-- Row 1 -->
+  <rect x="145" y="45" width="22" height="22" rx="4" fill="#FF7700" opacity="0.85" />
+  <rect x="175" y="45" width="45" height="22" rx="4" fill="#FF9900" opacity="0.9" />
+  <rect x="235" y="45" width="22" height="22" rx="4" fill="#FF5E00" opacity="0.75" />
+
+  <!-- Row 2 -->
+  <rect x="145" y="80" width="35" height="22" rx="4" fill="#FFAA00" opacity="0.8" />
+  <rect x="195" y="80" width="22" height="22" rx="4" fill="#FF5E00" opacity="0.9" />
+  <rect x="230" y="80" width="30" height="22" rx="4" fill="#FF7700" opacity="0.7" />
+
+  <!-- Center Cross & Modules -->
+  <rect x="45" y="145" width="24" height="24" rx="4" fill="#FF5E00" opacity="0.8" />
+  <rect x="85" y="145" width="35" height="24" rx="4" fill="#FFAA00" opacity="0.85" />
+  <rect x="135" y="135" width="40" height="40" rx="6" fill="#FF7700" opacity="0.9" />
+  <rect x="225" y="135" width="40" height="40" rx="6" fill="#FFAA00" opacity="0.9" />
+  <rect x="280" y="145" width="35" height="24" rx="4" fill="#FF5E00" opacity="0.85" />
+  <rect x="330" y="145" width="25" height="24" rx="4" fill="#FF9900" opacity="0.8" />
+
+  <!-- Center Badge / Icon -->
+  <rect x="155" y="155" width="90" height="90" rx="20" fill="#140D0B" stroke="#FF7700" stroke-width="3" filter="url(#glow)" />
+  <circle cx="200" cy="200" r="32" fill="#FF5E00" opacity="0.2" />
+  <path d="M185 200 L195 210 L215 190" fill="none" stroke="#FF9900" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="200" y="232" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="10" fill="#FFAA00" text-anchor="middle" letter-spacing="1.5">UPI PAY</text>
+
+  <!-- Bottom Simulated Patterns -->
+  <rect x="145" y="225" width="22" height="35" rx="4" fill="#FF7700" opacity="0.7" />
+  <rect x="235" y="225" width="25" height="35" rx="4" fill="#FFAA00" opacity="0.8" />
+  <rect x="145" y="280" width="35" height="22" rx="4" fill="#FF9900" opacity="0.85" />
+  <rect x="195" y="280" width="22" height="22" rx="4" fill="#FF5E00" opacity="0.7" />
+  <rect x="230" y="280" width="30" height="35" rx="4" fill="#FFAA00" opacity="0.9" />
+  <rect x="280" y="280" width="35" height="22" rx="4" fill="#FF7700" opacity="0.8" />
+  <rect x="330" y="280" width="25" height="22" rx="4" fill="#FFAA00" opacity="0.75" />
+
+  <rect x="145" y="325" width="45" height="35" rx="4" fill="#FFAA00" opacity="0.85" />
+  <rect x="205" y="325" width="45" height="35" rx="4" fill="#FF5E00" opacity="0.9" />
+  <rect x="275" y="325" width="80" height="35" rx="4" fill="#FF7700" opacity="0.8" />
+
+  <!-- Overlay Text Badge -->
+  <rect x="50" y="360" width="300" height="26" rx="8" fill="#1B120F" stroke="#FF5E00" stroke-width="1" opacity="0.9" />
+  <text x="200" y="377" font-family="sans-serif" font-size="11" font-weight="700" fill="#FFB703" text-anchor="middle" letter-spacing="1">SCAN WITH ANY UPI APP</text>
+</svg>
