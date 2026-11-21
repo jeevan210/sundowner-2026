@@ -3,10 +3,10 @@ import Interactive3DCard from './Interactive3DCard';
 
 export default function Venue({ onRegisterClick }) {
   const coordinators = [
-    { name: 'Sonika', phoneDisplay: '+91 81510 90944', phoneRaw: '918151090944', initial: 'S', role: 'Event Coordinator' },
-    { name: 'Arzoo', phoneDisplay: '+91 6362-172106', phoneRaw: '916362172106', initial: 'A', role: 'Event Coordinator' },
-    { name: 'Krupa', phoneDisplay: '+91 74834 01240', phoneRaw: '917483401240', initial: 'K', role: 'Event Coordinator' },
-    { name: 'Kuber', phoneDisplay: '+91 78998 24069', phoneRaw: '917899824069', initial: 'K', role: 'Event Coordinator' }
+    { name: 'Sonika', phoneDisplay: '+91\u00A081510\u00A090944', phoneRaw: '918151090944', initial: 'S', role: 'Event Coordinator' },
+    { name: 'Arzoo', phoneDisplay: '+91\u00A06362\u00A0172106', phoneRaw: '916362172106', initial: 'A', role: 'Event Coordinator' },
+    { name: 'Krupa', phoneDisplay: '+91\u00A074834\u00A001240', phoneRaw: '917483401240', initial: 'K', role: 'Event Coordinator' },
+    { name: 'Kuber', phoneDisplay: '+91\u00A078998\u00A024069', phoneRaw: '917899824069', initial: 'K', role: 'Event Coordinator' }
   ];
 
   return (
@@ -85,19 +85,18 @@ export default function Venue({ onRegisterClick }) {
                   <div key={i} className="coord-item-row layer-3d-float">
                     <div className="coord-left-meta">
                       <div className="coord-avatar">{c.initial}</div>
-                      <div>
+                      <div className="coord-info-col">
                         <div className="coord-name">{c.name}</div>
-                        <div className="coord-phone-text" style={{ fontSize: '0.8rem', color: 'var(--accent-gold)' }}>
+                        <div className="coord-phone-text">
                           <i className="fa-solid fa-phone"></i> {c.phoneDisplay}
                         </div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <div className="coord-actions-wrap">
                       <a 
                         href={`tel:${c.phoneRaw}`}
-                        className="coord-wa-pill"
-                        style={{ background: 'rgba(229, 152, 56, 0.12)', borderColor: 'rgba(229, 152, 56, 0.3)', color: 'var(--amber-gold)' }}
-                        title="Call Coordinator"
+                        className="coord-wa-pill coord-call-pill"
+                        title={`Call ${c.name}`}
                       >
                         <i className="fa-solid fa-phone"></i> Call
                       </a>
@@ -106,7 +105,7 @@ export default function Venue({ onRegisterClick }) {
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="coord-wa-pill"
-                        title="Chat on WhatsApp"
+                        title={`Chat with ${c.name} on WhatsApp`}
                       >
                         <i className="fa-brands fa-whatsapp"></i> WhatsApp
                       </a>

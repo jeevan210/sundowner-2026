@@ -99,7 +99,7 @@ export default function Hero({ onOpenTickets }) {
           {/* Top Date Badge with Subtle Luxury Sheen */}
           <div className="hero-top-badge">
             <i className="fa-regular fa-calendar text-orange"></i>
-            <span>29 NOVEMBER 2026 &nbsp;&bull;&nbsp; 4:00 PM – 8:00 PM &nbsp;&bull;&nbsp; EXCLUSIVE RESORT PARTY</span>
+            <span>29 NOVEMBER 2026 &nbsp;&bull;&nbsp; 4:00 PM – 8:00 PM <span className="hide-on-mobile">&nbsp;&bull;&nbsp; EXCLUSIVE RESORT PARTY</span></span>
           </div>
 
           {/* Headline Typography: Subtle 3D Falling Lights & Gathering */}
@@ -164,15 +164,15 @@ export default function Hero({ onOpenTickets }) {
             THE SUNSET. THE MUSIC. THE VIBE.
           </h2>
 
-          {/* Editorial Narrative Description */}
-          <p className="hero-narrative">
+          {/* Editorial Narrative Description (Hidden on mobile to let video breathe) */}
+          <p className="hero-narrative hide-on-mobile">
             Where golden-hour luxury meets electrifying poolside soundscapes. Escape into an intimate resort sanctuary featuring curated sunset DJ sets, complimentary botanical mocktails, hot high-tea appetizers, and unforgettable dusk memories.
           </p>
 
           {/* Venue Pill with Refined Glass Border */}
           <div className="hero-venue-pill">
             <i className="fa-solid fa-location-dot text-orange"></i>
-            <span><strong>Orchard Resort</strong>, Navge Cross, Chorla Road, Belagavi</span>
+            <span><strong>Orchard Resort</strong><span className="hide-on-mobile">, Navge Cross, Chorla Road</span>, Belagavi</span>
           </div>
 
           {/* Action CTA Buttons */}
@@ -187,15 +187,15 @@ export default function Hero({ onOpenTickets }) {
 
             <button 
               type="button" 
-              className="btn-hero-secondary btn-3d-depth" 
+              className="btn-hero-secondary btn-3d-depth hide-on-mobile" 
               onClick={() => scrollTo('highlights')}
             >
               <i className="fa-regular fa-compass"></i> View Event Details &nbsp;&rarr;
             </button>
           </div>
 
-          {/* Quick Trust / Feature Chips row */}
-          <div className="hero-trust-chips">
+          {/* Quick Trust / Feature Chips row (Hidden on mobile) */}
+          <div className="hero-trust-chips hide-on-mobile">
             <span className="trust-chip"><i className="fa-solid fa-shield-halved text-orange"></i> Verified Entry Pass</span>
             <span className="trust-chip"><i className="fa-solid fa-qrcode text-orange"></i> Instant WhatsApp QR</span>
             <span className="trust-chip"><i className="fa-solid fa-person-swimming text-orange"></i> Pool Access Included</span>
@@ -243,8 +243,8 @@ export default function Hero({ onOpenTickets }) {
                 </div>
               </div>
 
-              {/* Event Key Highlights Mini Pills */}
-              <div className="showcase-perks-compact layer-3d-float">
+              {/* Event Key Highlights Mini Pills (Hidden on mobile to keep video visible) */}
+              <div className="showcase-perks-compact layer-3d-float hide-on-mobile">
                 <div className="sc-perk-pill">
                   <i className="fa-regular fa-clock text-orange"></i>
                   <span>4:00 PM &ndash; 8:00 PM &bull; Pool till 6:30 PM</span>
@@ -270,7 +270,7 @@ export default function Hero({ onOpenTickets }) {
                   <span>Book Pass &bull; &#8377;500</span>
                   <i className="fa-solid fa-arrow-right"></i>
                 </button>
-                <div className="showcase-guarantee-note">
+                <div className="showcase-guarantee-note hide-on-mobile">
                   <i className="fa-solid fa-bolt text-orange"></i> Instant WhatsApp QR Pass
                 </div>
               </div>
