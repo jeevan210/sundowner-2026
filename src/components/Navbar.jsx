@@ -4,14 +4,66 @@ export default function Navbar({ onOpenTickets, onOpenAdmin, currentTheme, onTog
   const [activeTab, setActiveTab] = useState('hero');
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 30);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    const handleFs = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement || document.webkitFullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFs);
+    document.addEventListener('webkitfullscreenchange', handleFs);
+
+    const handlePrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handlePrompt);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('fullscreenchange', handleFs);
+      document.removeEventListener('webkitfullscreenchange', handleFs);
+      window.removeEventListener('beforeinstallprompt', handlePrompt);
+    };
   }, []);
+
+  const handleToggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    } catch (e) {
+      console.log('Fullscreen request prevented:', e.message);
+    }
+  };
+
+  const handleInstallApp = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if (choice && choice.outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    } else {
+      handleToggleFullscreen();
+    }
+  };
 
   const handleNavClick = (id) => {
     setActiveTab(id);
@@ -173,7 +225,7 @@ export default function Navbar({ onOpenTickets, onOpenAdmin, currentTheme, onTog
             <i className="fa-solid fa-location-dot text-orange"></i> Venue & Team
           </a>
 
-          {/* Mobile Theme Toggle & Admin Actions */}
+          {/* Mobile Theme Toggle & Fullscreen App Action */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', marginTop: '0.5rem' }}>
             <button 
               type="button" 
@@ -186,6 +238,15 @@ export default function Navbar({ onOpenTickets, onOpenAdmin, currentTheme, onTog
               ) : (
                 <><i className="fa-solid fa-sun text-orange"></i> Sunset Vibe</>
               )}
+            </button>
+            <button 
+              type="button" 
+              className="btn btn-secondary btn-sm"
+              onClick={() => { setMobileMenuOpen(false); handleInstallApp(); }}
+              style={{ justifyContent: 'center' }}
+              title="Fullscreen App View"
+            >
+              <i className={`fa-solid ${isFullscreen ? 'fa-compress' : 'fa-expand'} text-orange`}></i> {isFullscreen ? 'Exit Full' : 'Full Screen'}
             </button>
           </div>
 

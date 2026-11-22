@@ -83,6 +83,14 @@ export default function App() {
     } catch {}
   };
 
+  // Synchronize mobile status bar / browser toolbar color with active theme
+  useEffect(() => {
+    const meta = document.getElementById('theme-color-meta');
+    if (meta) {
+      meta.setAttribute('content', currentTheme === 'sunset' ? '#0a0807' : '#060911');
+    }
+  }, [currentTheme]);
+
   // Safe registrations state for instant coordinator / UI fallback
   const [registrations, setRegistrations] = useState(DEFAULT_REGISTRATIONS);
 
