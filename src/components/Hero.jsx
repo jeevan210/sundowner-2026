@@ -182,7 +182,7 @@ export default function Hero({ onOpenTickets }) {
               className="btn-hero-primary btn-3d-depth" 
               onClick={onOpenTickets}
             >
-              <i className="fa-solid fa-ticket"></i> Book Your Pass &bull; &#8377;500
+              <i className="fa-solid fa-ticket"></i> Book Your Pass &bull; &#8377;699
             </button>
 
             <button 
@@ -267,7 +267,7 @@ export default function Hero({ onOpenTickets }) {
                   onClick={onOpenTickets}
                 >
                   <i className="fa-solid fa-ticket"></i>
-                  <span>Book Pass &bull; &#8377;500</span>
+                  <span>Book Pass &bull; &#8377;699</span>
                   <i className="fa-solid fa-arrow-right"></i>
                 </button>
                 <div className="showcase-guarantee-note hide-on-mobile">

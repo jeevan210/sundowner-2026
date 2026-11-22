@@ -5,7 +5,7 @@ export default function MobileBottomBar({ onRegisterClick }) {
     <div className="mobile-bottom-bar">
       <div className="mobile-bar-meta">
         <span className="mobile-bar-title">SUNDOWNER 2026</span>
-        <span className="mobile-bar-sub">&#8377;500 &bull; 29 Nov &bull; Resort</span>
+        <span className="mobile-bar-sub">&#8377;699 &bull; 29 Nov &bull; Resort</span>
       </div>
       <div className="mobile-bar-actions">
         <a 
@@ -22,7 +22,7 @@ export default function MobileBottomBar({ onRegisterClick }) {
           onClick={onRegisterClick}
         >
           <i className="fa-solid fa-ticket"></i>
-          <span>Book Pass &bull; &#8377;500</span>
+          <span>Book Pass &bull; &#8377;699</span>
         </button>
       </div>
     </div>
