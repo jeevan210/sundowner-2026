@@ -29,7 +29,31 @@ app.use(express.static(distPath, { maxAge: '1d', etag: true }));
 // ============================================================================
 // MongoDB Connection & Graceful Fallback Memory Store (with persistent JSON backup)
 // ============================================================================
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sundowner2026';
+// Sanitize URI: automatically URL-encodes special characters in password (such as @ -> %40)
+const sanitizeMongoUri = (uri) => {
+  if (!uri) return uri;
+  try {
+    const prefix = uri.startsWith('mongodb+srv://') ? 'mongodb+srv://' : (uri.startsWith('mongodb://') ? 'mongodb://' : '');
+    if (!prefix) return uri;
+    const rest = uri.slice(prefix.length);
+    const lastAtIdx = rest.lastIndexOf('@');
+    if (lastAtIdx === -1) return uri;
+    const creds = rest.slice(0, lastAtIdx);
+    const hostAndQuery = rest.slice(lastAtIdx + 1);
+    const colonIdx = creds.indexOf(':');
+    if (colonIdx === -1) return uri;
+    const username = creds.slice(0, colonIdx);
+    const rawPass = creds.slice(colonIdx + 1);
+    const safeUser = encodeURIComponent(decodeURIComponent(username));
+    const safePass = encodeURIComponent(decodeURIComponent(rawPass));
+    return `${prefix}${safeUser}:${safePass}@${hostAndQuery}`;
+  } catch {
+    return uri;
+  }
+};
+
+const DEFAULT_ATLAS_URI = 'mongodb+srv://jeevanshetwe000_db_user:Mbappe%402001@cluster0.tv4i1ox.mongodb.net/sundowner2026?retryWrites=true&w=majority';
+const MONGODB_URI = sanitizeMongoUri(process.env.MONGODB_URI) || DEFAULT_ATLAS_URI;
 let isMongoConnected = false;
 
 // Default initial seed registrations
@@ -130,11 +154,36 @@ const Registration = mongoose.models.Registration || mongoose.model('Registratio
 
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI, {
-  serverSelectionTimeoutMS: 2500
+  serverSelectionTimeoutMS: 7000
 })
-.then(() => {
+.then(async () => {
   isMongoConnected = true;
-  console.log(`✅ [MongoDB] Connected successfully to: ${MONGODB_URI}`);
+  const maskedUri = MONGODB_URI.replace(/:([^:@]+)@/, ':****@');
+  console.log(`✅ [MongoDB Atlas] Connected successfully to: ${maskedUri}`);
+  try {
+    const count = await Registration.countDocuments();
+    if (count === 0 && Array.isArray(inMemoryRegistrations) && inMemoryRegistrations.length > 0) {
+      console.log(`🌱 [MongoDB Atlas] Initializing ${inMemoryRegistrations.length} initial registrations into cloud database...`);
+      for (const item of inMemoryRegistrations) {
+        await Registration.create({
+          ticketCode: item.ticketCode,
+          name: item.name,
+          age: item.age || '18+',
+          phone: item.phone,
+          email: item.email,
+          utr: item.utr || '',
+          screenshot: item.screenshot || '/assets/payment-qr.jpg',
+          status: item.status || 'Pending',
+          passSent: Boolean(item.passSent),
+          checkedIn: Boolean(item.checkedIn),
+          createdAt: item.createdAt || new Date()
+        });
+      }
+      console.log(`✅ [MongoDB Atlas] Database initialized with permanent records!`);
+    }
+  } catch (seedErr) {
+    console.warn('Seed notice:', seedErr.message);
+  }
 })
 .catch((err) => {
   isMongoConnected = false;
