@@ -21,8 +21,8 @@ app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
-// Serve static frontend assets from Vite dist
-app.use(express.static(distPath));
+// Serve static frontend assets from Vite dist with caching headers
+app.use(express.static(distPath, { maxAge: '1d', etag: true }));
 
 // ============================================================================
 // MongoDB Connection & Graceful Fallback Memory Store
@@ -308,18 +308,64 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// 3. Get all registrations (For Admin Panel)
+// 3. Get all registrations (Ultra-lightweight list for Admin Panel)
 app.get('/api/registrations', async (req, res) => {
   try {
+    let docs;
     if (isMongoConnected) {
-      const docs = await Registration.find().sort({ createdAt: -1 });
-      res.json(docs);
+      docs = await Registration.find().sort({ createdAt: -1 }).lean();
     } else {
-      res.json(inMemoryRegistrations);
+      docs = inMemoryRegistrations;
     }
+
+    // Optimize payload: if a screenshot is heavy (>30KB), replace it with a dedicated URL
+    const optimized = (docs || []).map(doc => {
+      const copy = { ...(doc.toObject ? doc.toObject() : doc) };
+      if (copy.screenshot && copy.screenshot.length > 30000) {
+        copy.screenshot = `/api/registrations/${doc._id || doc.ticketCode}/screenshot`;
+      }
+      return copy;
+    });
+
+    res.json(optimized);
   } catch (error) {
     console.error('Fetch error:', error);
     res.status(500).json({ error: 'Failed to retrieve registrations.' });
+  }
+});
+
+// Dedicated endpoint to stream screenshot on demand
+app.get('/api/registrations/:id/screenshot', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let reg = null;
+    if (isMongoConnected) {
+      reg = (await Registration.findById(id).lean()) || (await Registration.findOne({ ticketCode: id }).lean());
+    } else {
+      reg = inMemoryRegistrations.find(r => String(r._id) === String(id) || r.ticketCode === id);
+    }
+
+    if (!reg || !reg.screenshot) {
+      return res.redirect('/assets/payment-qr.jpg');
+    }
+
+    if (reg.screenshot.startsWith('data:image/')) {
+      const parts = reg.screenshot.split(',');
+      const match = parts[0].match(/:(.*?);/);
+      const mime = match ? match[1] : 'image/jpeg';
+      const imgBuffer = Buffer.from(parts[1], 'base64');
+      res.setHeader('Content-Type', mime);
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      return res.send(imgBuffer);
+    }
+
+    if (reg.screenshot.startsWith('http') || reg.screenshot.startsWith('/')) {
+      return res.redirect(reg.screenshot);
+    }
+
+    res.redirect('/assets/payment-qr.jpg');
+  } catch {
+    res.redirect('/assets/payment-qr.jpg');
   }
 });
 

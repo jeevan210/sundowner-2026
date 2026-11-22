@@ -17,7 +17,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #060911; font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #fff; text-align: center; padding: 1.5rem;">
+        <div style="width: 44px; height: 44px; border: 3px solid rgba(255, 94, 0, 0.2); border-top-color: #FF5E00; border-radius: 50%; animation: initialSpinner 0.8s linear infinite; margin-bottom: 1.25rem;"></div>
+        <div style="font-size: 1.25rem; font-weight: 800; letter-spacing: 2.5px; color: #FF8A00; text-transform: uppercase;">SUNDOWNER 2026</div>
+        <div style="font-size: 0.82rem; color: #8F9CAE; margin-top: 0.45rem; letter-spacing: 0.5px;">Loading Sunset Vibes...</div>
+      </div>
+      <style>
+        @keyframes initialSpinner { to { transform: rotate(360deg); } }
+      </style>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

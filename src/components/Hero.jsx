@@ -86,7 +86,7 @@ export default function Hero({ onOpenTickets }) {
           loop 
           muted 
           playsInline
-          preload="auto"
+          preload="metadata"
         />
       </div>
       <div className="hero-dark-vignette"></div>

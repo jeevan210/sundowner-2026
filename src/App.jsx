@@ -68,24 +68,23 @@ export default function App() {
 
   // Theme switcher state: 'midnight' (primary default) | 'sunset'
   const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem('sundowner_theme') || 'midnight';
+    try {
+      return localStorage.getItem('sundowner_theme') || 'midnight';
+    } catch {
+      return 'midnight';
+    }
   });
 
   const toggleTheme = () => {
     const nextTheme = currentTheme === 'sunset' ? 'midnight' : 'sunset';
     setCurrentTheme(nextTheme);
-    localStorage.setItem('sundowner_theme', nextTheme);
+    try {
+      localStorage.setItem('sundowner_theme', nextTheme);
+    } catch {}
   };
 
-  // Persistent registrations database state
-  const [registrations, setRegistrations] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sundowner_registrations');
-      return saved ? JSON.parse(saved) : DEFAULT_REGISTRATIONS;
-    } catch {
-      return DEFAULT_REGISTRATIONS;
-    }
-  });
+  // Safe registrations state for instant coordinator / UI fallback
+  const [registrations, setRegistrations] = useState(DEFAULT_REGISTRATIONS);
 
   // Hidden direct URL access: opens Admin Portal when navigating to /admin, #admin, or ?admin
   useEffect(() => {
@@ -114,28 +113,6 @@ export default function App() {
       window.history.replaceState(null, '', '/');
     }
   };
-
-  // Fetch registrations from MongoDB backend API
-  useEffect(() => {
-    const loadFromApi = async () => {
-      try {
-        const res = await fetch('/api/registrations');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            setRegistrations(data);
-          }
-        }
-      } catch (err) {
-        console.log('MongoDB server offline, using local state cache.');
-      }
-    };
-    loadFromApi();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('sundowner_registrations', JSON.stringify(registrations));
-  }, [registrations]);
 
   const handleScrollToTickets = () => {
     const el = document.getElementById('tickets');

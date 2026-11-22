@@ -15,14 +15,55 @@ export default function RegisterModal({ isOpen, onClose, onRegisterSuccess, upiI
 
   if (!isOpen) return null;
 
-  const handleFileChange = (e) => {
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      if (!file) return resolve(null);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const MAX_DIM = 750; // sharp readability for payment receipts, tiny size (~30-50KB)
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > MAX_DIM) {
+                height = Math.round((height * MAX_DIM) / width);
+                width = MAX_DIM;
+              }
+            } else {
+              if (height > MAX_DIM) {
+                width = Math.round((width * MAX_DIM) / height);
+                height = MAX_DIM;
+              }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', 0.65);
+            resolve(compressed);
+          } catch {
+            resolve(e.target.result);
+          }
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, screenshotPreview: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImage(file);
+      if (compressed) {
+        setFormData(prev => ({ ...prev, screenshotPreview: compressed }));
+      }
     }
   };
 
@@ -36,10 +77,14 @@ export default function RegisterModal({ isOpen, onClose, onRegisterSuccess, upiI
     setSubmitting(true);
 
     try {
-      // 1. Try sending to backend MongoDB API
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      // 1. Try sending to backend MongoDB API (ultra-lightweight compressed payload)
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           name: formData.name.trim(),
           age: formData.age || '18+',
@@ -49,6 +94,7 @@ export default function RegisterModal({ isOpen, onClose, onRegisterSuccess, upiI
           screenshot: formData.screenshotPreview || '/assets/payment-qr.jpg'
         })
       });
+      clearTimeout(timeoutId);
 
       if (res.ok) {
         const data = await res.json();
