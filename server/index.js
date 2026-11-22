@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
 import QRCode from 'qrcode';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
@@ -12,6 +13,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distPath = path.join(__dirname, '..', 'dist');
+const BACKUP_FILE = path.join(__dirname, 'registrations_backup.json');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,13 +27,13 @@ app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 app.use(express.static(distPath, { maxAge: '1d', etag: true }));
 
 // ============================================================================
-// MongoDB Connection & Graceful Fallback Memory Store
+// MongoDB Connection & Graceful Fallback Memory Store (with persistent JSON backup)
 // ============================================================================
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/sundowner2026';
 let isMongoConnected = false;
 
-// In-memory fallback database for instant local operation / testing
-let inMemoryRegistrations = [
+// Default initial seed registrations
+const DEFAULT_SEEDS = [
   {
     _id: 'seed-1',
     ticketCode: 'SUN-1082',
@@ -77,6 +79,35 @@ let inMemoryRegistrations = [
     createdAt: new Date(Date.now() - 3600000 * 6)
   }
 ];
+
+// Helper to load registrations from local persistent JSON backup
+const loadBackupRegistrations = () => {
+  try {
+    if (fs.existsSync(BACKUP_FILE)) {
+      const raw = fs.readFileSync(BACKUP_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        console.log(`📦 [Persistent Backup] Loaded ${parsed.length} registrations from ${BACKUP_FILE}`);
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('⚠️ [Backup] Notice: Could not read backup file:', err.message);
+  }
+  return [...DEFAULT_SEEDS];
+};
+
+// Helper to save registrations to local persistent JSON backup
+const saveBackupRegistrations = (list) => {
+  try {
+    fs.writeFileSync(BACKUP_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch (err) {
+    console.warn('⚠️ [Backup] Notice: Could not write backup file:', err.message);
+  }
+};
+
+// In-memory fallback database loaded from persistent JSON backup
+let inMemoryRegistrations = loadBackupRegistrations();
 
 // Mongoose Schema
 const registrationSchema = new mongoose.Schema({
@@ -286,6 +317,7 @@ app.post('/api/register', async (req, res) => {
     } else {
       savedRecord = { _id: `mem-${Date.now()}`, ...newRecordData };
       inMemoryRegistrations.unshift(savedRecord);
+      saveBackupRegistrations(inMemoryRegistrations);
     }
 
     // Generate QR code data URL
@@ -396,6 +428,8 @@ app.post('/api/registrations/:id/approve', async (req, res) => {
 
     if (isMongoConnected) {
       await regItem.save();
+    } else {
+      saveBackupRegistrations(inMemoryRegistrations);
     }
 
     // 2. Prepare instant WhatsApp share URL & message text
@@ -464,7 +498,10 @@ app.put('/api/registrations/:id/status', async (req, res) => {
       regItem = await Registration.findByIdAndUpdate(id, { status }, { new: true });
     } else {
       regItem = inMemoryRegistrations.find(r => r._id === id || r.ticketCode === id);
-      if (regItem) regItem.status = status;
+      if (regItem) {
+        regItem.status = status;
+        saveBackupRegistrations(inMemoryRegistrations);
+      }
     }
 
     if (!regItem) {
@@ -485,6 +522,7 @@ app.delete('/api/registrations/:id', async (req, res) => {
       await Registration.findByIdAndDelete(id);
     } else {
       inMemoryRegistrations = inMemoryRegistrations.filter(r => r._id !== id && r.ticketCode !== id);
+      saveBackupRegistrations(inMemoryRegistrations);
     }
     res.json({ success: true, message: 'Registration deleted.' });
   } catch (error) {
@@ -554,6 +592,7 @@ app.post('/api/checkin/:ticketCode', async (req, res) => {
       if (reg) {
         reg.checkedIn = true;
         reg.checkedInAt = new Date();
+        saveBackupRegistrations(inMemoryRegistrations);
       }
     }
 
