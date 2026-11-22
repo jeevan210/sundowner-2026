@@ -104,6 +104,79 @@ export default function AdminPanel({
     setTimeout(() => setToastMessage(null), 4500);
   };
 
+  // 1-Click Update Status: Approve or Reject
+  const handleSetStatus = async (guest, newStatus) => {
+    const guestId = guest._id || guest.ticketCode || guest.id;
+    setActionLoading(`${guestId}-${newStatus}`);
+
+    try {
+      const res = await fetch(`/api/registrations/${guestId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        showToast(data.message || `Registration #${guest.ticketCode || guestId} marked as ${newStatus}!`);
+        setDbRegistrations(prev => prev.map(item => {
+          if ((item._id && item._id === guestId) || item.ticketCode === guestId || item.id === guestId) {
+            return { ...item, status: newStatus };
+          }
+          return item;
+        }));
+        if (onUpdateStatus) onUpdateStatus(guestId, newStatus);
+      } else {
+        throw new Error(data.error || 'Failed to update status');
+      }
+    } catch (err) {
+      console.warn('Status update API error, applying local state update:', err);
+      setDbRegistrations(prev => prev.map(item => {
+        if ((item._id && item._id === guestId) || item.ticketCode === guestId || item.id === guestId) {
+          return { ...item, status: newStatus };
+        }
+        return item;
+      }));
+      if (onUpdateStatus) onUpdateStatus(guestId, newStatus);
+      showToast(`Registration marked as ${newStatus}!`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Separate on-demand Email VIP Pass sender
+  const handleSendEmail = async (guest) => {
+    const guestId = guest._id || guest.ticketCode || guest.id;
+    setActionLoading(`${guestId}-email`);
+
+    try {
+      const res = await fetch(`/api/registrations/${guestId}/email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        showToast(data.message || `VIP Pass successfully emailed to ${guest.email}!`);
+        setDbRegistrations(prev => prev.map(item => {
+          if ((item._id && item._id === guestId) || item.ticketCode === guestId || item.id === guestId) {
+            return { ...item, passSent: true, passSentAt: new Date() };
+          }
+          return item;
+        }));
+      } else {
+        showToast(data.error || 'Could not send email. Please verify email address and SMTP settings.', 'error');
+      }
+    } catch (err) {
+      console.error('Email dispatch error:', err);
+      showToast(`Email error: ${err.message}`, 'error');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // Flexible Approve: supports Email, direct WhatsApp, or offline fallback
   const handleApprove = async (guest, channel = 'email') => {
     const guestId = guest._id || guest.ticketCode || guest.id;
@@ -270,14 +343,18 @@ export default function AdminPanel({
     if (statusFilter === 'APPROVED') {
       return matchesSearch && (r.status === 'Approved' || r.status === 'Verified');
     }
+    if (statusFilter === 'REJECTED') {
+      return matchesSearch && r.status === 'Rejected';
+    }
     if (statusFilter === 'PENDING') {
-      return matchesSearch && r.status !== 'Approved' && r.status !== 'Verified';
+      return matchesSearch && r.status !== 'Approved' && r.status !== 'Verified' && r.status !== 'Rejected';
     }
     return matchesSearch;
   });
 
   const approvedCount = allRegistrations.filter(r => r.status === 'Approved' || r.status === 'Verified').length;
-  const pendingCount = allRegistrations.length - approvedCount;
+  const rejectedCount = allRegistrations.filter(r => r.status === 'Rejected').length;
+  const pendingCount = allRegistrations.filter(r => r.status !== 'Approved' && r.status !== 'Verified' && r.status !== 'Rejected').length;
   const checkedInCount = allRegistrations.filter(r => r.checkedIn).length;
 
   return (
@@ -523,7 +600,7 @@ export default function AdminPanel({
              ================================================================ */
           <div>
             {/* Metric Summary Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
               <div style={{ background: '#14100E', border: '1px solid var(--border-subtle)', borderRadius: '16px', padding: '1.15rem' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700 }}>Total Registrations</span>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', fontWeight: 900, color: '#fff', marginTop: '0.2rem' }}>
@@ -531,22 +608,29 @@ export default function AdminPanel({
                 </div>
               </div>
 
-              <div style={{ background: '#14100E', border: '1px solid rgba(34, 197, 94, 0.25)', borderRadius: '16px', padding: '1.15rem' }}>
-                <span style={{ fontSize: '0.75rem', color: '#22C55E', textTransform: 'uppercase', fontWeight: 700 }}>Approved & Passes Sent</span>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', fontWeight: 900, color: '#22C55E', marginTop: '0.2rem' }}>
-                  {approvedCount}
-                </div>
-              </div>
-
               <div style={{ background: '#14100E', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '16px', padding: '1.15rem' }}>
-                <span style={{ fontSize: '0.75rem', color: '#F59E0B', textTransform: 'uppercase', fontWeight: 700 }}>Pending Verification</span>
+                <span style={{ fontSize: '0.75rem', color: '#F59E0B', textTransform: 'uppercase', fontWeight: 700 }}>Pending Review</span>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', fontWeight: 900, color: '#F59E0B', marginTop: '0.2rem' }}>
                   {pendingCount}
                 </div>
               </div>
 
+              <div style={{ background: '#14100E', border: '1px solid rgba(34, 197, 94, 0.25)', borderRadius: '16px', padding: '1.15rem' }}>
+                <span style={{ fontSize: '0.75rem', color: '#22C55E', textTransform: 'uppercase', fontWeight: 700 }}>Approved</span>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', fontWeight: 900, color: '#22C55E', marginTop: '0.2rem' }}>
+                  {approvedCount}
+                </div>
+              </div>
+
+              <div style={{ background: '#14100E', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '16px', padding: '1.15rem' }}>
+                <span style={{ fontSize: '0.75rem', color: '#EF4444', textTransform: 'uppercase', fontWeight: 700 }}>Rejected</span>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', fontWeight: 900, color: '#EF4444', marginTop: '0.2rem' }}>
+                  {rejectedCount}
+                </div>
+              </div>
+
               <div style={{ background: '#14100E', border: '1px solid var(--border-amber)', borderRadius: '16px', padding: '1.15rem' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--amber-gold)', textTransform: 'uppercase', fontWeight: 700 }}>Checked In at Entrance</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--amber-gold)', textTransform: 'uppercase', fontWeight: 700 }}>Gate Checked-In</span>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.85rem', fontWeight: 900, color: 'var(--amber-gold)', marginTop: '0.2rem' }}>
                   {checkedInCount}
                 </div>
@@ -578,6 +662,14 @@ export default function AdminPanel({
                 </button>
                 <button 
                   type="button" 
+                  onClick={() => setStatusFilter('PENDING')}
+                  className={`btn btn-sm ${statusFilter === 'PENDING' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ color: statusFilter === 'PENDING' ? '#000' : '#F59E0B' }}
+                >
+                  Pending ({pendingCount})
+                </button>
+                <button 
+                  type="button" 
                   onClick={() => setStatusFilter('APPROVED')}
                   className={`btn btn-sm ${statusFilter === 'APPROVED' ? 'btn-primary' : 'btn-secondary'}`}
                   style={{ color: statusFilter === 'APPROVED' ? '#000' : '#22C55E' }}
@@ -586,11 +678,11 @@ export default function AdminPanel({
                 </button>
                 <button 
                   type="button" 
-                  onClick={() => setStatusFilter('PENDING')}
-                  className={`btn btn-sm ${statusFilter === 'PENDING' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ color: statusFilter === 'PENDING' ? '#000' : '#F59E0B' }}
+                  onClick={() => setStatusFilter('REJECTED')}
+                  className={`btn btn-sm ${statusFilter === 'REJECTED' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ color: statusFilter === 'REJECTED' ? '#000' : '#EF4444' }}
                 >
-                  Pending ({pendingCount})
+                  Rejected ({rejectedCount})
                 </button>
               </div>
 
@@ -642,6 +734,7 @@ export default function AdminPanel({
                     filtered.map((item) => {
                       const id = item._id || item.ticketCode || item.id;
                       const isApproved = item.status === 'Approved' || item.status === 'Verified';
+                      const isRejected = item.status === 'Rejected';
 
                       return (
                         <tr key={id} className="admin-table-row" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
@@ -735,118 +828,194 @@ export default function AdminPanel({
 
                           {/* Status Badge */}
                           <td style={{ padding: '0.85rem 1rem' }}>
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.35rem',
-                              padding: '0.25rem 0.65rem',
-                              borderRadius: '9999px',
-                              fontSize: '0.72rem',
-                              fontWeight: 800,
-                              background: isApproved ? 'rgba(34, 197, 94, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                              border: `1px solid ${isApproved ? 'rgba(34, 197, 94, 0.4)' : 'rgba(245, 158, 11, 0.4)'}`,
-                              color: isApproved ? '#22C55E' : '#F59E0B'
-                            }}>
-                              <i className={`fa-solid ${isApproved ? 'fa-check' : 'fa-clock'}`}></i>
-                              {isApproved ? 'Approved' : 'Pending'}
-                            </span>
+                            {isApproved ? (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.25rem 0.65rem',
+                                borderRadius: '9999px',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                background: 'rgba(34, 197, 94, 0.15)',
+                                border: '1px solid rgba(34, 197, 94, 0.4)',
+                                color: '#22C55E'
+                              }}>
+                                <i className="fa-solid fa-check"></i> Approved
+                              </span>
+                            ) : isRejected ? (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.25rem 0.65rem',
+                                borderRadius: '9999px',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                background: 'rgba(239, 68, 68, 0.15)',
+                                border: '1px solid rgba(239, 68, 68, 0.4)',
+                                color: '#EF4444'
+                              }}>
+                                <i className="fa-solid fa-xmark"></i> Rejected
+                              </span>
+                            ) : (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.25rem 0.65rem',
+                                borderRadius: '9999px',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                background: 'rgba(245, 158, 11, 0.15)',
+                                border: '1px solid rgba(245, 158, 11, 0.4)',
+                                color: '#F59E0B'
+                              }}>
+                                <i className="fa-solid fa-clock"></i> Pending
+                              </span>
+                            )}
                           </td>
 
-                          {/* Actions: Approve & Email, Approve & WhatsApp, Gate Admit */}
+                          {/* Actions: Approve, Reject, Separate Email, Gate Admit */}
                           <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
                             <div style={{ display: 'inline-flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                              {!isApproved ? (
-                                <>
-                                  {/* 1-Click WhatsApp Approve */}
-                                  <button
-                                    type="button"
-                                    onClick={() => handleApprove(item, 'whatsapp')}
-                                    disabled={actionLoading === id}
-                                    className="btn btn-sm"
-                                    style={{ 
-                                      background: '#22C55E', 
-                                      color: '#000', 
-                                      fontWeight: 800, 
-                                      padding: '0.35rem 0.65rem', 
-                                      fontSize: '0.72rem', 
-                                      border: 'none', 
-                                      display: 'inline-flex', 
-                                      alignItems: 'center', 
-                                      gap: '0.3rem' 
-                                    }}
-                                    title="Approve and immediately open guest's WhatsApp with VIP Pass Code"
-                                  >
-                                    <i className="fa-brands fa-whatsapp"></i> WhatsApp Pass
-                                  </button>
-
-                                  {/* Standard Email Approve */}
-                                  <button 
-                                    type="button" 
-                                    onClick={() => handleApprove(item, 'email')}
-                                    disabled={actionLoading === id}
-                                    className="btn btn-primary btn-sm"
-                                    style={{ padding: '0.35rem 0.75rem', fontSize: '0.72rem' }}
-                                    title="Approve registration and send VIP Pass email"
-                                  >
-                                    {actionLoading === id ? (
-                                      <><i className="fa-solid fa-spinner fa-spin"></i></>
-                                    ) : (
-                                      <><i className="fa-solid fa-paper-plane"></i> Email Pass</>
-                                    )}
-                                  </button>
-                                </>
-                              ) : (
-                                <>
-                                  {/* Direct Gate Check-In (Make them in) */}
-                                  {!item.checkedIn ? (
-                                    <button 
-                                      type="button" 
-                                      onClick={() => handleCheckInGuest(item.ticketCode || item.id)}
-                                      className="btn btn-sm"
-                                      style={{ 
-                                        background: 'rgba(34, 197, 94, 0.15)', 
-                                        border: '1px solid #22C55E', 
-                                        color: '#22C55E', 
-                                        padding: '0.3rem 0.65rem', 
-                                        fontSize: '0.72rem', 
-                                        fontWeight: 800,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '0.3rem'
-                                      }}
-                                      title="Admit guest at entrance gate"
-                                    >
-                                      <i className="fa-solid fa-person-walking-arrow-right"></i> Admit Guest
-                                    </button>
+                              
+                              {/* 1. APPROVE BUTTON */}
+                              {!isApproved && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetStatus(item, 'Approved')}
+                                  disabled={actionLoading === `${id}-Approved`}
+                                  className="btn btn-sm"
+                                  style={{ 
+                                    background: '#22C55E', 
+                                    color: '#000', 
+                                    fontWeight: 800, 
+                                    padding: '0.35rem 0.65rem', 
+                                    fontSize: '0.75rem', 
+                                    border: 'none', 
+                                    display: 'inline-flex', 
+                                    alignItems: 'center', 
+                                    gap: '0.3rem' 
+                                  }}
+                                  title="Approve registration"
+                                >
+                                  {actionLoading === `${id}-Approved` ? (
+                                    <i className="fa-solid fa-spinner fa-spin"></i>
                                   ) : (
-                                    <span style={{ 
-                                      color: '#22C55E', 
-                                      fontSize: '0.72rem', 
-                                      fontWeight: 800, 
-                                      padding: '0.2rem 0.5rem', 
-                                      background: 'rgba(34, 197, 94, 0.12)', 
-                                      border: '1px solid rgba(34, 197, 94, 0.3)',
-                                      borderRadius: '6px' 
-                                    }}>
-                                      <i className="fa-solid fa-circle-check"></i> Admitted
-                                    </span>
+                                    <><i className="fa-solid fa-check"></i> Approve</>
                                   )}
-
-                                  {/* Resend Email */}
-                                  <button 
-                                    type="button" 
-                                    onClick={() => handleApprove(item, 'email')}
-                                    disabled={actionLoading === id}
-                                    className="btn btn-secondary btn-sm"
-                                    style={{ padding: '0.3rem 0.55rem', fontSize: '0.7rem' }}
-                                    title="Resend VIP Pass Email"
-                                  >
-                                    {actionLoading === id ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-rotate-right"></i>}
-                                  </button>
-                                </>
+                                </button>
                               )}
 
-                              {/* Delete */}
+                              {/* 2. REJECT BUTTON */}
+                              {!isRejected && (
+                                <button 
+                                  type="button" 
+                                  onClick={() => handleSetStatus(item, 'Rejected')}
+                                  disabled={actionLoading === `${id}-Rejected`}
+                                  className="btn btn-sm"
+                                  style={{ 
+                                    background: 'rgba(239, 68, 68, 0.15)', 
+                                    border: '1px solid #EF4444', 
+                                    color: '#EF4444', 
+                                    fontWeight: 700,
+                                    padding: '0.35rem 0.65rem', 
+                                    fontSize: '0.75rem',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.3rem'
+                                  }}
+                                  title="Reject registration"
+                                >
+                                  {actionLoading === `${id}-Rejected` ? (
+                                    <i className="fa-solid fa-spinner fa-spin"></i>
+                                  ) : (
+                                    <><i className="fa-solid fa-xmark"></i> Reject</>
+                                  )}
+                                </button>
+                              )}
+
+                              {/* 3. SEPARATE OPTIONAL EMAIL DISPATCH */}
+                              <button 
+                                type="button" 
+                                onClick={() => handleSendEmail(item)}
+                                disabled={actionLoading === `${id}-email`}
+                                className="btn btn-primary btn-sm"
+                                style={{ 
+                                  padding: '0.35rem 0.65rem', 
+                                  fontSize: '0.75rem',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem'
+                                }}
+                                title="Send VIP Pass email to attendee"
+                              >
+                                {actionLoading === `${id}-email` ? (
+                                  <i className="fa-solid fa-spinner fa-spin"></i>
+                                ) : (
+                                  <><i className="fa-solid fa-paper-plane"></i> {item.passSent ? 'Resend Email' : 'Email Pass'}</>
+                                )}
+                              </button>
+
+                              {/* 4. WHATSAPP PASS SHARE */}
+                              <a 
+                                href={getWhatsAppShareUrl(item.phone, item.name, item.ticketCode || item.id)}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="btn btn-secondary btn-sm"
+                                style={{ 
+                                  padding: '0.35rem 0.6rem', 
+                                  fontSize: '0.75rem', 
+                                  color: '#22C55E',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem',
+                                  textDecoration: 'none'
+                                }}
+                                title="Share VIP Pass on WhatsApp"
+                              >
+                                <i className="fa-brands fa-whatsapp"></i> WhatsApp
+                              </a>
+
+                              {/* 5. GATE ADMISSION FOR APPROVED GUESTS */}
+                              {isApproved && (
+                                !item.checkedIn ? (
+                                  <button 
+                                    type="button" 
+                                    onClick={() => handleCheckInGuest(item.ticketCode || item.id)}
+                                    className="btn btn-sm"
+                                    style={{ 
+                                      background: 'rgba(34, 197, 94, 0.15)', 
+                                      border: '1px solid #22C55E', 
+                                      color: '#22C55E', 
+                                      padding: '0.3rem 0.65rem', 
+                                      fontSize: '0.72rem', 
+                                      fontWeight: 800,
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.3rem'
+                                    }}
+                                    title="Admit guest at entrance gate"
+                                  >
+                                    <i className="fa-solid fa-person-walking-arrow-right"></i> Admit
+                                  </button>
+                                ) : (
+                                  <span style={{ 
+                                    color: '#22C55E', 
+                                    fontSize: '0.72rem', 
+                                    fontWeight: 800, 
+                                    padding: '0.2rem 0.5rem', 
+                                    background: 'rgba(34, 197, 94, 0.12)', 
+                                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                                    borderRadius: '6px' 
+                                  }}>
+                                    <i className="fa-solid fa-circle-check"></i> Admitted
+                                  </span>
+                                )
+                              )}
+
+                              {/* 6. DELETE BUTTON */}
                               <button 
                                 type="button" 
                                 onClick={() => handleDelete(id)}

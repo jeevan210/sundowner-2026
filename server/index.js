@@ -536,7 +536,7 @@ app.post('/api/registrations/:id/approve', async (req, res) => {
   }
 });
 
-// 5. Update Status (Manual toggle)
+// 5. Update Status (Approve / Reject / Pending toggle)
 app.put('/api/registrations/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
@@ -544,9 +544,14 @@ app.put('/api/registrations/:id/status', async (req, res) => {
 
     let regItem = null;
     if (isMongoConnected) {
-      regItem = await Registration.findByIdAndUpdate(id, { status }, { new: true });
+      if (mongoose.isValidObjectId(id)) {
+        regItem = await Registration.findByIdAndUpdate(id, { status }, { new: true });
+      }
+      if (!regItem) {
+        regItem = await Registration.findOneAndUpdate({ ticketCode: id }, { status }, { new: true });
+      }
     } else {
-      regItem = inMemoryRegistrations.find(r => r._id === id || r.ticketCode === id);
+      regItem = inMemoryRegistrations.find(r => String(r._id) === String(id) || r.ticketCode === id);
       if (regItem) {
         regItem.status = status;
         saveBackupRegistrations(inMemoryRegistrations);
@@ -560,6 +565,69 @@ app.put('/api/registrations/:id/status', async (req, res) => {
     res.json({ success: true, registration: regItem });
   } catch (error) {
     res.status(500).json({ error: 'Failed to update status.' });
+  }
+});
+
+// 5b. Send VIP Pass Email (Separate on-demand option)
+app.post('/api/registrations/:id/email', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let regItem = null;
+
+    if (isMongoConnected) {
+      if (mongoose.isValidObjectId(id)) {
+        regItem = await Registration.findById(id);
+      }
+      if (!regItem) {
+        regItem = await Registration.findOne({ ticketCode: id });
+      }
+    } else {
+      regItem = inMemoryRegistrations.find(r => String(r._id) === String(id) || r.ticketCode === id);
+    }
+
+    if (!regItem) {
+      return res.status(404).json({ error: 'Registration not found.' });
+    }
+
+    if (!regItem.email || !regItem.email.includes('@')) {
+      return res.status(400).json({ error: 'Attendee does not have a valid email address.' });
+    }
+
+    const transporter = getTransporter();
+    if (!transporter) {
+      return res.status(500).json({ error: 'Email SMTP service is not configured.' });
+    }
+
+    const mailOptions = {
+      from: `"SUNDOWNER 2026" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to: regItem.email,
+      subject: `🎟️ Your VIP Pass for SUNDOWNER 2026! [${regItem.ticketCode}]`,
+      html: buildVipPassEmail({
+        name: regItem.name,
+        ticketCode: regItem.ticketCode
+      })
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✉️ VIP Pass email dispatched to ${regItem.email}. MsgId: ${info.messageId}`);
+
+    regItem.passSent = true;
+    regItem.passSentAt = new Date();
+
+    if (isMongoConnected) {
+      await regItem.save();
+    } else {
+      saveBackupRegistrations(inMemoryRegistrations);
+    }
+
+    res.json({
+      success: true,
+      message: `Pass #${regItem.ticketCode} successfully emailed to ${regItem.email}!`,
+      registration: regItem
+    });
+  } catch (err) {
+    console.error('Mail dispatch error:', err);
+    res.status(500).json({ error: err.message || 'Failed to dispatch email.' });
   }
 });
 
