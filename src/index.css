@@ -2925,6 +2925,28 @@ body {
   flex-shrink: 0;
 }
 
+.mobile-bottom-bar.clean-dock {
+  justify-content: center;
+  padding: 0.65rem 1rem calc(0.65rem + env(safe-area-inset-bottom, 0px)) 1rem;
+}
+
+.mobile-bar-actions.clean-actions {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.mobile-bar-book-btn.flex-1 {
+  flex: 1;
+  justify-content: center;
+  padding: 0.75rem 1.15rem;
+  font-size: 0.92rem;
+  letter-spacing: 0.3px;
+}
+
 .mobile-bar-call-btn {
   width: 38px;
   height: 38px;

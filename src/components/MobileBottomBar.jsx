@@ -36,12 +36,9 @@ export default function MobileBottomBar({ onRegisterClick }) {
   };
 
   return (
-    <div className="mobile-bottom-bar">
-      <div className="mobile-bar-meta">
-        <span className="mobile-bar-title">SUNDOWNER 2026</span>
-        <span className="mobile-bar-sub">&#8377;699 &bull; 29 Nov &bull; Resort</span>
-      </div>
-      <div className="mobile-bar-actions">
+    <div className="mobile-bottom-bar clean-dock">
+      <div className="mobile-bar-actions clean-actions">
+        {/* 1. Fullscreen App Button */}
         <button
           type="button"
           onClick={handleToggleFullscreen}
@@ -52,6 +49,8 @@ export default function MobileBottomBar({ onRegisterClick }) {
         >
           <i className={`fa-solid ${isFullscreen ? 'fa-compress' : 'fa-expand'}`}></i>
         </button>
+
+        {/* 2. Call Coordinator Button */}
         <a 
           href="tel:918151090944" 
           className="mobile-bar-call-btn" 
@@ -60,13 +59,15 @@ export default function MobileBottomBar({ onRegisterClick }) {
         >
           <i className="fa-solid fa-phone"></i>
         </a>
+
+        {/* 3. Primary Book Now CTA */}
         <button 
           type="button" 
-          className="mobile-bar-book-btn btn-pulse" 
+          className="mobile-bar-book-btn btn-pulse flex-1" 
           onClick={onRegisterClick}
         >
           <i className="fa-solid fa-ticket"></i>
-          <span>Book Pass &bull; &#8377;699</span>
+          <span>Book Now &bull; &#8377;699</span>
         </button>
       </div>
     </div>
